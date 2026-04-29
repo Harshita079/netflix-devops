@@ -45,20 +45,22 @@ resource "aws_instance" "jenkins" {
   user_data = <<EOF
 #!/bin/bash
 
-# Update system
 yum update -y
+yum install docker git -y
 
-# Install Docker
-yum install docker -y
-
-# Start Docker
 systemctl start docker
 systemctl enable docker
 
-# Run Jenkins container (simple & stable)
+cd /home/ec2-user
+
+# Clone your GitHub repo
+git clone https://github.com/Harshita079/netflix-devops.git
+
+# Run Jenkins with auto pipeline script mounted
 docker run -d \
   -p 8080:8080 \
   -p 50000:50000 \
+  -v /home/ec2-user/netflix-devops/jenkins:/var/jenkins_home/init.groovy.d \
   --name jenkins \
   jenkins/jenkins:lts
 
