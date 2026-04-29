@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    background-color: #111;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* NAVBAR */
+.navbar {
+    position: fixed;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+
+.logo {
+    color: red;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* BANNER */
+.banner {
+    background: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c') center/cover no-repeat;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    padding-left: 50px;
+}
+
+.banner-content h1 {
+    font-size: 3rem;
+}
+
+/* BUTTONS */
+.btn {
+    background-color: #e50914;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #f40612;
+}
+
+/* ROWS */
+.row {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+.row-posters {
+    display: flex;
+    overflow-x: scroll;
+    gap: 10px;
+    padding-bottom: 10px;
+}
+
+.row-posters img {
+    width: 150px;
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.3s;
+    border-radius: 6px;
+}
+
+.row-posters img:hover {
+    transform: scale(1.2);
+}
