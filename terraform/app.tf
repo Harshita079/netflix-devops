@@ -8,10 +8,30 @@ resource "aws_instance" "app" {
 
   user_data = <<-EOF
 #!/bin/bash
+
 yum update -y
-yum install docker -y
+
+# Install Docker + Git
+yum install docker git -y
+
+# Start Docker
 systemctl start docker
 systemctl enable docker
+
+cd /home/ec2-user
+
+# Clone repo
+git clone https://github.com/Harshita079/netflix-devops.git
+
+cd netflix-devops
+
+# Build image
+docker build -t netflix-app .
+
+# Run container (force clean run)
+docker rm -f netflix-container || true
+docker run -d -p 80:80 --name netflix-container netflix-app
+
 EOF
 
   tags = {
