@@ -2,6 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
+# Security Group
 resource "aws_security_group" "netflix_sg" {
   name = "netflix-sg"
 
@@ -34,29 +35,40 @@ resource "aws_security_group" "netflix_sg" {
   }
 }
 
+# Jenkins EC2
 resource "aws_instance" "jenkins" {
-  ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2 (us-east-1)
+  ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
   key_name      = "netflix-key"
+
+  associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.netflix_sg.id]
 
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install docker -y
-              systemctl start docker
-              systemctl enable docker
+#!/bin/bash
 
-              yum install java-17-amazon-corretto -y
+# Update system
+yum update -y
 
-              wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-              rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-              yum install jenkins -y
+# Install Java 11 (IMPORTANT FIX)
+yum install java-11-amazon-corretto -y
 
-              systemctl start jenkins
-              systemctl enable jenkins
-              EOF
+# Install Docker
+yum install docker -y
+systemctl start docker
+systemctl enable docker
+
+# Install Jenkins
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install jenkins -y
+
+# Start Jenkins
+systemctl start jenkins
+systemctl enable jenkins
+
+EOF
 
   tags = {
     Name = "Jenkins-Server"
