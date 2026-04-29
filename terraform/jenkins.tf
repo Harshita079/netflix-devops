@@ -45,29 +45,20 @@ resource "aws_instance" "jenkins" {
   user_data = <<EOF
 #!/bin/bash
 
+# Update system
 yum update -y
-yum install docker git -y
 
+# Install Docker
+yum install docker -y
+
+# Start Docker
 systemctl start docker
 systemctl enable docker
 
-cd /home/ec2-user
-
-# Clone your repo
-git clone https://github.com/Harshita079/netflix-devops.git
-
-# Setup Jenkins config directory
-mkdir -p /var/jenkins_home/casc_configs
-
-# Copy JCasC config
-cp netflix-devops/jenkins/jenkins.yaml /var/jenkins_home/casc_configs/
-
-# Run Jenkins container
+# Run Jenkins container (simple & stable)
 docker run -d \
   -p 8080:8080 \
   -p 50000:50000 \
-  -v /var/jenkins_home:/var/jenkins_home \
-  -e CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs \
   --name jenkins \
   jenkins/jenkins:lts
 
