@@ -2,7 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Security Group
 resource "aws_security_group" "netflix_sg" {
   name = "netflix-sg"
 
@@ -35,7 +34,6 @@ resource "aws_security_group" "netflix_sg" {
   }
 }
 
-# Jenkins EC2
 resource "aws_instance" "jenkins" {
   ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
@@ -47,20 +45,14 @@ resource "aws_instance" "jenkins" {
   user_data = <<-EOF
 #!/bin/bash
 
-# Update system
 yum update -y
 
 # Install Docker
 yum install docker -y
-
-# Start Docker
 systemctl start docker
 systemctl enable docker
 
-# Pull Jenkins image
-docker pull jenkins/jenkins:lts
-
-# Run Jenkins container (FULLY AUTOMATED)
+# Run Jenkins container as ROOT (NO permission issue)
 docker run -d \
   -p 8080:8080 \
   -p 50000:50000 \
