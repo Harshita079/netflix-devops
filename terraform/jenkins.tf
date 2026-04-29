@@ -2,6 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
+# Security Group
 resource "aws_security_group" "netflix_sg" {
   name = "netflix-sg"
 
@@ -34,6 +35,7 @@ resource "aws_security_group" "netflix_sg" {
   }
 }
 
+# Jenkins EC2
 resource "aws_instance" "jenkins" {
   ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
@@ -50,19 +52,19 @@ yum update -y
 
 # Install Docker
 yum install docker -y
+
+# Start Docker
 systemctl start docker
 systemctl enable docker
 
-# Add ec2-user to docker group
-usermod -aG docker ec2-user
-
-# Pull Jenkins Docker image
+# Pull Jenkins image
 docker pull jenkins/jenkins:lts
 
-# Run Jenkins container
+# Run Jenkins container (FULLY AUTOMATED)
 docker run -d \
   -p 8080:8080 \
   -p 50000:50000 \
+  --restart always \
   --name jenkins \
   jenkins/jenkins:lts
 

@@ -3,15 +3,16 @@ resource "aws_instance" "app" {
   instance_type = "t2.micro"
   key_name      = "netflix-key"
 
-  vpc_security_group_ids = [aws_security_group.netflix_sg.id]
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.netflix_sg.id]
 
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install docker -y
-              systemctl start docker
-              systemctl enable docker
-              EOF
+#!/bin/bash
+yum update -y
+yum install docker -y
+systemctl start docker
+systemctl enable docker
+EOF
 
   tags = {
     Name = "Netflix-App"
