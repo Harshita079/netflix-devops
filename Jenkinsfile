@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Get Application IP') {
+        stage('Get App IP') {
             steps {
                 script {
                     APP_IP = sh(
@@ -32,20 +32,36 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    echo "App IP is: ${APP_IP}"
+                    echo "App IP: ${APP_IP}"
                 }
             }
         }
 
-        stage('Deploy Application') {
+        stage('Deploy on EC2') {
             steps {
-                sh '''
-                chmod +x scripts/deploy.sh
+                sh """
+                echo "Deploying to $APP_IP"
 
-                echo "Deploying to $APP_IP..."
+                ssh -o StrictHostKeyChecking=no ec2-user@$APP_IP << 'EOF'
 
-                ./scripts/deploy.sh $APP_IP
-                '''
+                sudo yum install docker -y
+                sudo systemctl start docker
+                sudo systemctl enable docker
+
+                sudo docker stop \$(sudo docker ps -aq) || true
+                sudo docker rm \$(sudo docker ps -aq) || true
+                sudo docker rmi \$(sudo docker images -q) || true
+
+                rm -rf netflix-devops
+                git clone https://github.com/Harshita079/netflix-devops.git
+
+                cd netflix-devops
+                sudo docker build -t netflix-app .
+
+                sudo docker run -d -p 80:80 --name netflix-container netflix-app
+
+                EOF
+                """
             }
         }
     }
